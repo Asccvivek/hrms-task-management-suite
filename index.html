@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NexFlow Ops — Enterprise HRMS & Operations Task Management Suite | Vivek Debnath</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            heading: ['Plus Jakarta Sans', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#EEF2FF',
+              500: '#6366F1',
+              600: '#4F46E5',
+              700: '#4338CA',
+              900: '#312E81',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-[#0A0E17] text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- Top Global Navigation Bar -->
+  <header class="sticky top-0 z-40 bg-[#0F172A]/90 backdrop-blur-md border-b border-slate-800/80 px-6 py-3.5">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      
+      <!-- Brand & Project Details -->
+      <div class="flex items-center space-x-4">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/25 border border-indigo-400/30">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-base font-extrabold font-heading text-white tracking-tight">NexFlow Ops</h1>
+            <span class="text-[11px] font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded-full border border-indigo-500/20">HRMS & Task OS</span>
+            <span class="text-[11px] font-mono bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Live System
+            </span>
+          </div>
+          <p class="text-xs text-slate-400">Architected & Engineered by <span class="text-slate-200 font-semibold">Vivek Debnath</span> · Operations & Technical PM</p>
+        </div>
+      </div>
+
+      <!-- Action Buttons & Clock -->
+      <div class="flex items-center space-x-3">
+        <!-- Live IST Clock -->
+        <div class="hidden md:flex items-center space-x-2 bg-slate-900/90 border border-slate-800 px-3 py-1.5 rounded-lg text-xs font-mono text-slate-300">
+          <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span id="live-clock-badge">--:--:-- IST</span>
+        </div>
+
+        <button onclick="openNewTaskModal()" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold shadow-md shadow-indigo-600/30 transition flex items-center gap-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          New Task
+        </button>
+
+        <button onclick="openNewEmployeeModal()" class="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-lg text-xs font-semibold border border-slate-700 transition flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+          Onboard Employee
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-6 py-6 space-y-6">
+
+    <!-- KPI Summary Row -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      
+      <div class="glass-card p-4 rounded-xl border border-slate-800/80">
+        <div class="flex items-center justify-between text-slate-400 text-xs font-medium">
+          <span>SLA Adherence Rate</span>
+          <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <div class="mt-2 flex items-baseline space-x-2">
+          <span id="metric-sla-rate" class="text-2xl font-extrabold font-heading text-emerald-400">96%</span>
+          <span class="text-xs text-slate-400">vs 85% Benchmark</span>
+        </div>
+        <div class="mt-2 w-full bg-slate-800 rounded-full h-1">
+          <div class="bg-emerald-500 h-1 rounded-full" style="width: 96%"></div>
+        </div>
+      </div>
+
+      <div class="glass-card p-4 rounded-xl border border-slate-800/80">
+        <div class="flex items-center justify-between text-slate-400 text-xs font-medium">
+          <span>Completed Today</span>
+          <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <div class="mt-2 flex items-baseline space-x-2">
+          <span id="metric-tasks-count" class="text-2xl font-extrabold font-heading text-slate-100">1 / 5</span>
+          <span class="text-xs text-slate-400">Recurring SLA items</span>
+        </div>
+        <div class="mt-2 w-full bg-slate-800 rounded-full h-1">
+          <div class="bg-indigo-500 h-1 rounded-full" style="width: 20%"></div>
+        </div>
+      </div>
+
+      <div class="glass-card p-4 rounded-xl border border-slate-800/80">
+        <div class="flex items-center justify-between text-slate-400 text-xs font-medium">
+          <span>Workforce On-Floor</span>
+          <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+        </div>
+        <div class="mt-2 flex items-baseline space-x-2">
+          <span id="metric-headcount" class="text-2xl font-extrabold font-heading text-slate-100">4 / 5 Active</span>
+          <span class="text-xs text-amber-400">1 On Leave</span>
+        </div>
+        <div class="mt-2 w-full bg-slate-800 rounded-full h-1">
+          <div class="bg-amber-500 h-1 rounded-full" style="width: 80%"></div>
+        </div>
+      </div>
+
+      <div class="glass-card p-4 rounded-xl border border-slate-800/80">
+        <div class="flex items-center justify-between text-slate-400 text-xs font-medium">
+          <span>In-Flight Tasks</span>
+          <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        </div>
+        <div class="mt-2 flex items-baseline space-x-2">
+          <span id="metric-in-flight" class="text-2xl font-extrabold font-heading text-slate-100">2 Tasks</span>
+          <span class="text-xs text-indigo-400 font-mono">Cutoffs < 16:30</span>
+        </div>
+        <div class="mt-2 w-full bg-slate-800 rounded-full h-1">
+          <div class="bg-purple-500 h-1 rounded-full" style="width: 50%"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Navigation Sub-Tabs -->
+    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+      <div class="flex items-center space-x-2 bg-slate-900/80 p-1.5 rounded-xl border border-slate-800 text-xs font-semibold">
+        <button class="nav-tab px-3.5 py-1.5 rounded-lg bg-indigo-600 text-white transition flex items-center gap-1.5" data-target="tab-tasks">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+          Task Kanban Desk
+        </button>
+
+        <button class="nav-tab px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 transition flex items-center gap-1.5" data-target="tab-hrms">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+          Employee Directory
+        </button>
+
+        <button class="nav-tab px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 transition flex items-center gap-1.5" data-target="tab-attendance">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Attendance & Shifts
+        </button>
+
+        <button class="nav-tab px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 transition flex items-center gap-1.5" data-target="tab-leaves">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          Leave Management
+        </button>
+
+        <button class="nav-tab px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 transition flex items-center gap-1.5" data-target="tab-analytics">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/></svg>
+          Analytics & Audit Log
+        </button>
+      </div>
+
+      <!-- Quick Search / Filter -->
+      <div class="hidden lg:flex items-center space-x-3 text-xs">
+        <div class="relative">
+          <input type="text" id="search-tasks" placeholder="Search tasks or ID..." class="bg-slate-900 border border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 w-48">
+          <svg class="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </div>
+
+        <select id="filter-assignee" class="bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-indigo-500">
+          <option value="all">All Assignees</option>
+          <option value="Rohan Sharma">Rohan Sharma</option>
+          <option value="Priya Patel">Priya Patel</option>
+          <option value="Ankit Verma">Ankit Verma</option>
+          <option value="Sneha Kulkarni">Sneha Kulkarni</option>
+          <option value="Vikram Malhotra">Vikram Malhotra</option>
+        </select>
+
+        <select id="filter-dept" class="bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-indigo-500">
+          <option value="all">All Departments</option>
+          <option value="Supply Chain">Supply Chain</option>
+          <option value="Logistics">Logistics</option>
+          <option value="Operations">Operations</option>
+          <option value="Customer Ops">Customer Ops</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- TAB 1: KANBAN TASK DESK -->
+    <div id="tab-tasks" class="tab-content active space-y-4">
+      
+      <!-- Kanban Column Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+        
+        <!-- Column 1: Backlog -->
+        <div class="kanban-col p-3 flex flex-col">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+            <div class="flex items-center space-x-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Backlog</h3>
+            </div>
+            <span id="count-backlog" class="text-xs bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full font-mono font-bold">1</span>
+          </div>
+          <div id="col-backlog" class="space-y-3 flex-1"></div>
+        </div>
+
+        <!-- Column 2: To Do / Assigned -->
+        <div class="kanban-col p-3 flex flex-col">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+            <div class="flex items-center space-x-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">To Do</h3>
+            </div>
+            <span id="count-todo" class="text-xs bg-slate-800 text-blue-400 px-2 py-0.5 rounded-full font-mono font-bold">1</span>
+          </div>
+          <div id="col-todo" class="space-y-3 flex-1"></div>
+        </div>
+
+        <!-- Column 3: In Progress -->
+        <div class="kanban-col p-3 flex flex-col">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+            <div class="flex items-center space-x-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">In Progress</h3>
+            </div>
+            <span id="count-inprogress" class="text-xs bg-slate-800 text-amber-400 px-2 py-0.5 rounded-full font-mono font-bold">1</span>
+          </div>
+          <div id="col-inprogress" class="space-y-3 flex-1"></div>
+        </div>
+
+        <!-- Column 4: Under Review / Proof -->
+        <div class="kanban-col p-3 flex flex-col">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+            <div class="flex items-center space-x-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Review</h3>
+            </div>
+            <span id="count-review" class="text-xs bg-slate-800 text-purple-400 px-2 py-0.5 rounded-full font-mono font-bold">1</span>
+          </div>
+          <div id="col-review" class="space-y-3 flex-1"></div>
+        </div>
+
+        <!-- Column 5: Completed / SLA Met -->
+        <div class="kanban-col p-3 flex flex-col">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+            <div class="flex items-center space-x-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Completed</h3>
+            </div>
+            <span id="count-completed" class="text-xs bg-slate-800 text-emerald-400 px-2 py-0.5 rounded-full font-mono font-bold">1</span>
+          </div>
+          <div id="col-completed" class="space-y-3 flex-1"></div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- TAB 2: HRMS EMPLOYEE DIRECTORY -->
+    <div id="tab-hrms" class="tab-content space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-bold font-heading text-white">Operations & Staff Directory</h2>
+          <p class="text-xs text-slate-400">Manage employee records, department affiliations, contact details, and active SLA workloads.</p>
+        </div>
+        <button onclick="openNewEmployeeModal()" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          Add New Employee
+        </button>
+      </div>
+
+      <div id="employee-directory-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- Rendered by app.js -->
+      </div>
+    </div>
+
+    <!-- TAB 3: ATTENDANCE & SHIFTS -->
+    <div id="tab-attendance" class="tab-content space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-bold font-heading text-white">Shift & Attendance Roster</h2>
+          <p class="text-xs text-slate-400">Automated punch tracking, late mark calculations, and work-mode monitoring for floor staff.</p>
+        </div>
+        <div class="flex items-center space-x-2">
+          <span class="text-xs text-slate-400">Status Sync:</span>
+          <span class="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Biometric Sync Active</span>
+        </div>
+      </div>
+
+      <div class="glass-card rounded-2xl border border-slate-800/80 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-900/80 border-b border-slate-800 text-[11px] uppercase tracking-wider text-slate-400 font-semibold">
+                <th class="py-3 px-4">Employee</th>
+                <th class="py-3 px-4">Department</th>
+                <th class="py-3 px-4">Shift Timings</th>
+                <th class="py-3 px-4">Today's Punch</th>
+                <th class="py-3 px-4">Attendance Status</th>
+                <th class="py-3 px-4">Work Location</th>
+                <th class="py-3 px-4">Override Action</th>
+              </tr>
+            </thead>
+            <tbody id="attendance-tbody">
+              <!-- Rendered by app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: LEAVE MANAGEMENT -->
+    <div id="tab-leaves" class="tab-content space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-bold font-heading text-white">Leave Requests & Approvals</h2>
+          <p class="text-xs text-slate-400">Review pending leaves, deduct balances, and maintain operational staffing coverage.</p>
+        </div>
+      </div>
+
+      <div id="leaves-container" class="space-y-3">
+        <!-- Rendered by app.js -->
+      </div>
+    </div>
+
+    <!-- TAB 5: ANALYTICS & AUDIT LOG -->
+    <div id="tab-analytics" class="tab-content space-y-6">
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <!-- Department SLA Breakdown -->
+        <div class="glass-card p-5 rounded-2xl border border-slate-800/80 space-y-4">
+          <h3 class="font-bold text-white text-sm flex items-center justify-between">
+            <span>Department SLA Performance</span>
+            <span class="text-xs text-indigo-400 font-mono font-normal">Target: 95%</span>
+          </h3>
+
+          <div class="space-y-3 text-xs">
+            <div>
+              <div class="flex justify-between text-slate-300 font-medium mb-1">
+                <span>Supply Chain (Inward & Vendor GRN)</span>
+                <span class="text-emerald-400 font-bold">98.5%</span>
+              </div>
+              <div class="w-full bg-slate-800 rounded-full h-2">
+                <div class="bg-emerald-500 h-2 rounded-full" style="width: 98.5%"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-slate-300 font-medium mb-1">
+                <span>Logistics & Marketplace Dispatch</span>
+                <span class="text-indigo-400 font-bold">94.0%</span>
+              </div>
+              <div class="w-full bg-slate-800 rounded-full h-2">
+                <div class="bg-indigo-500 h-2 rounded-full" style="width: 94%"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-slate-300 font-medium mb-1">
+                <span>Warehouse Operations & Bin Audits</span>
+                <span class="text-amber-400 font-bold">91.2%</span>
+              </div>
+              <div class="w-full bg-slate-800 rounded-full h-2">
+                <div class="bg-amber-500 h-2 rounded-full" style="width: 91.2%"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-slate-300 font-medium mb-1">
+                <span>Customer Ops & NDR Resolution</span>
+                <span class="text-emerald-400 font-bold">96.8%</span>
+              </div>
+              <div class="w-full bg-slate-800 rounded-full h-2">
+                <div class="bg-emerald-500 h-2 rounded-full" style="width: 96.8%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Real-Time Activity & Escalation Audit Log -->
+        <div class="glass-card p-5 rounded-2xl border border-slate-800/80 space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-white text-sm">Live System Audit Trail</h3>
+            <span class="text-[10px] font-mono bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded border border-indigo-500/20">Auto-logging</span>
+          </div>
+
+          <div id="recent-activity-list" class="space-y-3 overflow-y-auto max-h-60 pr-1">
+            <!-- Rendered by app.js -->
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- MODAL: CREATE NEW TASK -->
+  <div id="new-task-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-[#111827] border border-slate-700 rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-white font-heading">Assign New Operations Task</h3>
+        <button onclick="closeNewTaskModal()" class="text-slate-400 hover:text-white">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <form onsubmit="handleCreateTaskSubmit(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">Task Title *</label>
+          <input type="text" id="task-title-input" required placeholder="e.g., Courier NDR Escalations & Reattempt Call Sheet" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500">
+        </div>
+
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">Task SOP / Instructions</label>
+          <textarea id="task-desc-input" rows="2" placeholder="Detail SOP steps, expected checklist, and verification proof." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Assignee *</label>
+            <select id="task-assignee-select" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500">
+              <!-- Populated by JS -->
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Priority Tier</label>
+            <select id="task-priority-select" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500">
+              <option value="P0">P0 (Critical SLA / 2-Hr Cutoff)</option>
+              <option value="P1" selected>P1 (High Priority / Same Day)</option>
+              <option value="P2">P2 (Normal Cadence)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Cutoff Time (IST)</label>
+            <select id="task-cutoff-select" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500 font-mono">
+              <option value="12:00 IST">12:00 IST</option>
+              <option value="14:00 IST">14:00 IST</option>
+              <option value="15:30 IST">15:30 IST</option>
+              <option value="16:00 IST" selected>16:00 IST (Daily Standard)</option>
+              <option value="17:00 IST">17:00 IST</option>
+              <option value="18:30 IST">18:30 IST</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Cadence / Recurrence</label>
+            <select class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500">
+              <option value="Daily">Daily Recurring</option>
+              <option value="Weekly">Weekly Cycle</option>
+              <option value="One-Time">Ad-Hoc / One-Time</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-slate-800 flex justify-end space-x-2">
+          <button type="button" onclick="closeNewTaskModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-semibold transition shadow-md shadow-indigo-600/30">Assign Task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD NEW EMPLOYEE -->
+  <div id="new-employee-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-[#111827] border border-slate-700 rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-white font-heading">Onboard New Employee into HRMS</h3>
+        <button onclick="closeNewEmployeeModal()" class="text-slate-400 hover:text-white">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <form onsubmit="handleCreateEmployeeSubmit(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">Full Name *</label>
+          <input type="text" id="emp-name-input" required placeholder="e.g., Deepika Sen" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Job Designation *</label>
+            <input type="text" id="emp-role-input" required placeholder="e.g., Logistics Coordinator" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500">
+          </div>
+
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Department *</label>
+            <select id="emp-dept-select" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500">
+              <option value="Supply Chain">Supply Chain</option>
+              <option value="Logistics">Logistics</option>
+              <option value="Operations" selected>Operations</option>
+              <option value="Customer Ops">Customer Ops</option>
+              <option value="Quality Assurance">Quality Assurance</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Official Email</label>
+            <input type="email" id="emp-email-input" placeholder="e.g., deepika.s@alloinnoware.com" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500">
+          </div>
+
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Contact Phone</label>
+            <input type="text" id="emp-phone-input" placeholder="+91 98765 00000" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500">
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-slate-800 flex justify-end space-x-2">
+          <button type="button" onclick="closeNewEmployeeModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-semibold transition shadow-md shadow-indigo-600/30">Complete Onboarding</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: TASK DETAIL VIEW -->
+  <div id="task-detail-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-[#111827] border border-slate-700 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center space-x-2">
+          <span id="detail-task-id" class="text-xs font-mono font-bold text-indigo-400 bg-indigo-950/60 px-2 py-0.5 rounded border border-indigo-800/50"></span>
+          <span id="detail-task-priority" class="text-xs px-2 py-0.5 rounded font-semibold badge-p1"></span>
+        </div>
+        <button onclick="closeTaskDetailModal()" class="text-slate-400 hover:text-white">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="space-y-3">
+        <h3 id="detail-task-title" class="text-base font-bold text-slate-100"></h3>
+        <p id="detail-task-desc" class="text-xs text-slate-300 bg-slate-900/60 p-3 rounded-lg border border-slate-800"></p>
+
+        <div class="grid grid-cols-2 gap-3 text-xs bg-slate-900/40 p-3 rounded-xl border border-slate-800">
+          <div>
+            <span class="text-slate-500 block text-[10px] uppercase font-bold">Assignee</span>
+            <span id="detail-task-assignee" class="font-semibold text-slate-200"></span>
+          </div>
+          <div>
+            <span class="text-slate-500 block text-[10px] uppercase font-bold">Department</span>
+            <span id="detail-task-dept" class="font-semibold text-slate-200"></span>
+          </div>
+          <div>
+            <span class="text-slate-500 block text-[10px] uppercase font-bold">Cutoff SLA</span>
+            <span id="detail-task-cutoff" class="font-mono text-amber-400 font-semibold"></span>
+          </div>
+          <div>
+            <span class="text-slate-500 block text-[10px] uppercase font-bold">Current Stage</span>
+            <span id="detail-task-status" class="font-bold text-indigo-400"></span>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="text-slate-400">Execution Progress</span>
+            <span id="detail-task-progress-txt" class="font-bold text-indigo-400"></span>
+          </div>
+          <div class="w-full bg-slate-800 rounded-full h-2">
+            <div id="detail-task-progress" class="bg-indigo-500 h-2 rounded-full" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div>
+          <span class="text-slate-400 block text-xs font-semibold mb-1">Proof & Audit Evidence:</span>
+          <div id="detail-task-proof" class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-800"></div>
+        </div>
+      </div>
+
+      <div class="pt-3 border-t border-slate-800 flex justify-end">
+        <button onclick="closeTaskDetailModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-medium transition">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800/80 bg-[#0F172A]/50 py-4 px-6 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-2">
+      <span>NexFlow Ops Management System &copy; 2026 · Designed for High-Throughput E-Commerce & Warehousing Operations</span>
+      <span>Lead PM: <a href="https://github.com/Asccvivek" target="_blank" class="text-indigo-400 hover:underline font-medium">Vivek Debnath (Asccvivek)</a></span>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
